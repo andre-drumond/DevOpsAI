@@ -1,0 +1,46 @@
+services:
+  # 1. O Motor da IA (Ollama)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: devopsai_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      # Persiste os modelos (ex: llama3.2) para não baixar novamente
+      - ollama_storage:/root/.ollama
+    restart: unless-stopped
+
+  # 2. O Backend (FastAPI + ChromaDB)
+  backend:
+    build: ./backend
+    container_name: devopsai_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    volumes:
+      # Persiste o banco de vetores (ChromaDB)
+      # Mapeia o volume 'chroma_storage' para a pasta criada pelo script Python
+      - chroma_storage:/app/chroma_db
+    depends_on:
+      - ollama
+    restart: on-failure
+
+  # 3. O Frontend (Streamlit)
+  frontend:
+    build: ./frontend
+    container_name: devopsai_frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+    restart: on-failure
+
+# Definição dos Volumes Gerenciados pelo Docker
+volumes:
+  ollama_storage:
+    name: devopsai_ollama_data
+  chroma_storage:
+    name: devopsai_chroma_data
