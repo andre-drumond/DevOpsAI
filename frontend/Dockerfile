@@ -1,10 +1,12 @@
 FROM python:3.10-slim
 
 # Cria usuário não-root
-RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
+RUN useradd -m -u 1000 appuser
 
 WORKDIR /app
+
+# Ajusta permissões do diretório /app
+RUN chown -R appuser:appuser /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
