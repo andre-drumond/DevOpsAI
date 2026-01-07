@@ -23,7 +23,7 @@ app = FastAPI(title="DevOpsAI Backend")
 # Configurações
 PERSIST_DIRECTORY = "/app/chroma_db" # Caminho absoluto para garantir o volume
 OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-MODEL_NAME = "llama3.2"
+MODEL_NAME = "deepseek-r1:1.5b"
 
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 

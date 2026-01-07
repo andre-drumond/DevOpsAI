@@ -6,7 +6,7 @@
 
 Esta solução foi desenhada para ser modular e conteinerizada:
 
-* **LLM Engine:** [Ollama](https://ollama.com/) (executando Llama 3.2 ou Mistral).
+* **LLM Engine:** [Ollama](https://ollama.com/) (executando Llama 3.2, DeepSeek, Mistral ou outros modelos locais).
 * **Backend:** Python + FastAPI + LangChain (Orquestração e Ingestão).
 * **Frontend:** Streamlit (Interface de Chat).
 * **Vector Store:** ChromaDB (Persistência de vetores e metadados).
@@ -58,14 +58,32 @@ Isso iniciará três serviços:
 
 O container do Ollama inicia vazio. Precisamos baixar o modelo de linguagem. Execute o comando abaixo no seu terminal:
 
+**Opção 1: Llama 3.2 (Padrão)**
 ```bash
 docker exec -it devopsai_ollama ollama run llama3.2
-
 ```
 
 *Isso fará o download do modelo Llama 3.2 (~2GB). Quando terminar e aparecer um prompt `>>>`, você pode digitar `/bye` ou pressionar `Ctrl+D` para sair.*
 
-> **Nota:** Se desejar um modelo mais robusto e tiver hardware suficiente (8GB+ RAM), você pode substituir `llama3.2` por `llama3` ou `mistral`. Lembre-se de atualizar a variável `MODEL_NAME` em `backend/main.py`.
+**Opção 2: DeepSeek R1 (Recomendado para velocidade)**
+
+Para usar o DeepSeek (modelo rápido e eficiente), execute:
+
+```bash
+docker exec -it devopsai_ollama ollama pull deepseek-r1:1.5b
+```
+
+Ou para melhor qualidade (requer mais RAM):
+```bash
+docker exec -it devopsai_ollama ollama pull deepseek-r1:8b
+```
+
+Depois, atualize a variável `MODEL_NAME` em `backend/main.py` para `"deepseek-r1:1.5b"` ou `"deepseek-r1:8b"` e reinicie o backend:
+```bash
+docker compose restart backend
+```
+
+> **Nota:** Se desejar um modelo mais robusto e tiver hardware suficiente (8GB+ RAM), você pode usar `llama3`, `mistral` ou `deepseek-r1:8b`. Sempre atualize a variável `MODEL_NAME` em `backend/main.py` ao trocar de modelo.
 
 ---
 
@@ -83,6 +101,54 @@ docker exec -it devopsai_ollama ollama run llama3.2
 * A IA irá processar e responder com base no contexto encontrado.
 
 
+
+---
+
+## 🚀 Usando DeepSeek (Modelo Rápido)
+
+O **DeepSeek** é uma excelente alternativa ao Llama 3.2, oferecendo respostas mais rápidas mantendo boa qualidade. Está disponível localmente via Ollama.
+
+### Opções de Modelos DeepSeek:
+
+- **`deepseek-r1:1.5b`** (~1.1GB) - Mais rápido, ideal para respostas rápidas
+- **`deepseek-r1:8b`** (~4.7GB) - Melhor qualidade, requer mais RAM
+- **`deepseek`** - Versão padrão do DeepSeek Chat
+- **`deepseek-coder`** - Especializado em código e programação
+
+### Passos para habilitar DeepSeek:
+
+1. **Baixar o modelo:**
+   ```bash
+   docker exec -it devopsai_ollama ollama pull deepseek-r1:1.5b
+   ```
+
+2. **Atualizar o backend:**
+   Edite o arquivo `backend/main.py` e altere a linha:
+   ```python
+   MODEL_NAME = "deepseek-r1:1.5b"
+   ```
+
+3. **Reiniciar o backend:**
+   ```bash
+   docker compose restart backend
+   ```
+
+### Gerenciar Modelos Instalados:
+
+**Listar modelos instalados:**
+```bash
+docker exec devopsai_ollama ollama list
+```
+
+**Deletar um modelo antigo (para liberar espaço):**
+```bash
+docker exec devopsai_ollama ollama rm llama3.2:latest
+```
+
+**Testar um modelo antes de usar:**
+```bash
+docker exec -it devopsai_ollama ollama run deepseek-r1:1.5b
+```
 
 ---
 
@@ -132,4 +198,4 @@ Se quiser interagir diretamente com a API (via Postman ou Curl):
 
 **Lentidão na resposta**
 
-* Como é uma IA local, a velocidade depende 100% da sua CPU/GPU. O modelo `llama3.2` é otimizado para velocidade, mas textos muito longos podem demorar alguns segundos.
+* Como é uma IA local, a velocidade depende 100% da sua CPU/GPU. Modelos menores como `deepseek-r1:1.5b` ou `llama3.2` são otimizados para velocidade. Para melhor performance, considere usar `deepseek-r1:1.5b` ou `phi3:mini`. Textos muito longos podem demorar alguns segundos mesmo assim.
