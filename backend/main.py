@@ -28,6 +28,8 @@ MODEL_NAME = "deepseek-r1:1.5b"
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 def get_vectorstore():
+    # Usa ChromaDB em modo persistente local
+    # Versões 0.4.x são mais estáveis para uso local sem servidor
     return Chroma(
         persist_directory=PERSIST_DIRECTORY, 
         embedding_function=embeddings
