@@ -89,7 +89,7 @@ docker compose restart backend
 
 ## 📖 Como Usar
 
-1. Acesse o frontend no navegador: **[http://localhost:8501](https://www.google.com/search?q=http://localhost:8501)**.
+1. Acesse o frontend no navegador: **[http://localhost:8501](http://localhost:8501)**.
 2. Na barra lateral (**Sidebar**):
 * Clique em **"Browse files"** e selecione um PDF técnico.
 * Clique em **"Processar PDF"**. Aguarde a mensagem de sucesso.
