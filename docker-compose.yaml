@@ -8,6 +8,15 @@ services:
     volumes:
       # Persiste os modelos (ex: llama3.2) para não baixar novamente
       - ollama_storage:/root/.ollama
+      # Monta certificados do sistema (se disponíveis)
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+    environment:
+      # Configurações de proxy (se necessário)
+      - HTTP_PROXY=${HTTP_PROXY:-}
+      - HTTPS_PROXY=${HTTPS_PROXY:-}
+      - NO_PROXY=${NO_PROXY:-localhost,127.0.0.1}
+      # Para ignorar verificação SSL (use apenas se necessário)
+      - SSL_SKIP_VERIFY=${SSL_SKIP_VERIFY:-false}
     restart: unless-stopped
 
   # 2. O Backend (FastAPI + ChromaDB)
@@ -24,6 +33,12 @@ services:
       - chroma_storage:/app/chroma_db
     depends_on:
       - ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     restart: on-failure
 
   # 3. O Frontend (Streamlit)
@@ -35,7 +50,8 @@ services:
     environment:
       - BACKEND_URL=http://backend:8000
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     restart: on-failure
 
 # Definição dos Volumes Gerenciados pelo Docker

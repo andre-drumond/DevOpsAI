@@ -4,6 +4,7 @@ python-multipart
 langchain
 langchain-community
 langchain-ollama
+langchain-classic
 chromadb
 pypdf
 sentence-transformers
