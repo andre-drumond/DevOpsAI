@@ -9,3 +9,6 @@ chromadb==0.4.22
 numpy<2.0.0
 pypdf
 sentence-transformers
+python-docx
+markdown
+httpx
